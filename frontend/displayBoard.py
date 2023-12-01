@@ -1,7 +1,8 @@
 import pygame
 import chess
 from pygame.locals import *
-from frontend.handleButton import handleButton
+from backend.printLegalMoves import printLegalMoves
+from frontend.getSquare import getSquare
 from frontend.makeButton import makeButton
 def displayBoard(board,turn):
     pygame.init()
@@ -10,13 +11,48 @@ def displayBoard(board,turn):
 
     square_size = 60  # Adjust the square size as needed
     colors = [(255, 206, 158), (209, 139, 71)]  # Light and dark square colors
-
+    selected_square = None  # Initialize selected_square variable
+    
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
+                print("Closing Game...")
                 running = False
-        turn = handleButton(event, turn,480,0,120,60)
+            if event.type == MOUSEBUTTONDOWN:
+                # Get the square from mouse coordinates
+                x, y = pygame.mouse.get_pos()
+                print(x,y)
+                if event.button == 1 and (0<x<480 and 0<y<480):  #Left mouse button
+                    square = getSquare(x, y,square_size)
+                    print(square)
+                    if selected_square is None:
+                        # Select the piece to move
+                        selected_square = square if board.piece_at(square) and board.piece_at(square).color == turn else None
+                        print("White" if turn else "Black")
+                    else:
+                        # Move the piece
+                        move = chess.Move(selected_square, square)
+                        print(move)
+                        if move in board.legal_moves:
+                            print(move," is a Legal move")
+                            board.push(move)
+                            turn = not turn
+                            print("White" if turn else "Black")
+                        else:
+                            print("Illegal move")
+                            print("Legal moves are as follows:")
+                            printLegalMoves(board)
+                        selected_square = None
+                elif event.button == 1 and 480 <= x <= 600 and 0 <= y <= 60:  # Button click
+                    move = chess.Move.null()
+                    board.push(move)
+                    turn = not turn
+                    print("Change turn button clicked")
+                    print("White" if turn else "Black")
+                    #selected_square = None
+                else:
+                    print("something else happened")
         
         screen.fill((128, 128, 128))  # Fill the screen with black background
 
