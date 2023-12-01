@@ -1,9 +1,11 @@
 import pygame
 import chess
 from pygame.locals import *
+from backend.getBestMove import get_top_move
 from backend.printLegalMoves import printLegalMoves
 from frontend.getSquare import getSquare
 from frontend.makeButton import makeButton
+from backend.getBestMoves import get_top_moves
 def displayBoard(board,turn):
     pygame.init()
     screen = pygame.display.set_mode((600, 480))
@@ -20,6 +22,10 @@ def displayBoard(board,turn):
                 print("Closing Game...")
                 running = False
             if event.type == MOUSEBUTTONDOWN:
+                top_move = get_top_move(board)
+                print("Top move:", top_move)
+                #top_moves = get_top_moves(board)
+                #print("Top 5 moves:", top_moves)
                 # Get the square from mouse coordinates
                 x, y = pygame.mouse.get_pos()
                 print(x,y)
